@@ -1,7 +1,16 @@
-import { GraphQLObjectType, GraphQLInt, GraphQLString } from 'graphql';
+import {
+  GraphQLObjectType,
+  GraphQLInt,
+  GraphQLString,
+  GraphQLList
+} from 'graphql';
 import { adressType } from './adress.type';
 import { companyType } from './company.type';
+import { postType } from '../post/post.type';
+import { IUser } from '../../_types/user';
+import { getPostsByUserId } from '../../_requests/post';
 
+// @ts-ignore
 export const userType = new GraphQLObjectType({
   name: 'User',
   fields: {
@@ -12,6 +21,12 @@ export const userType = new GraphQLObjectType({
     address: { type: adressType },
     phone: { type: GraphQLString },
     website: { type: GraphQLString },
-    company: { type: companyType }
+    company: { type: companyType },
+    posts: {
+      type: new GraphQLList(postType),
+      resolve: ({ id }: IUser) => {
+        return getPostsByUserId(id);
+      }
+    }
   }
 });

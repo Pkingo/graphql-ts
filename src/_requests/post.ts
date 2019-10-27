@@ -12,3 +12,9 @@ export const getPost = (id: number): Promise<IPost> => {
     .get<IPost>(`https://jsonplaceholder.typicode.com/posts/${id}`)
     .then(resp => resp.data);
 };
+
+export const getPostsByUserId = (userId: number): Promise<IPost[]> => {
+  return axois
+    .get<IPost[]>(`https://jsonplaceholder.typicode.com/posts?userId=${userId}`)
+    .then(resp => resp.data);
+};
