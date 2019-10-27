@@ -2,50 +2,58 @@ import {
   GraphQLInt,
   GraphQLList,
   GraphQLObjectType,
-  GraphQLSchema
+  GraphQLSchema,
+  GraphQLNonNull
 } from 'graphql';
-import { authors, posts } from '../mockData';
-import { authorType } from './author/author.type';
-import { authorNameType } from './author/authorName.type';
+
+// GraphQL types
+import { userType } from './user/user.type';
 import { postType } from './post/post.type';
+import { commentType } from './comment/comment.type';
+
+// requests
+import { getUsers, getUser } from '../_requests/user';
+import { getPost, getPosts } from '../_requests/post';
+import { getComment, getComments } from '../_requests/comment';
 
 const queryType = new GraphQLObjectType({
   name: 'Query',
   fields: {
+    user: {
+      type: userType,
+      args: { id: { type: new GraphQLNonNull(GraphQLInt) } },
+      resolve: (_, { id }) => {
+        return getUser(id);
+      }
+    },
+    users: {
+      type: new GraphQLList(userType),
+      resolve: getUsers
+    },
     post: {
       type: postType,
-      args: {
-        id: { type: GraphQLInt }
-      },
+      args: { id: { type: new GraphQLNonNull(GraphQLInt) } },
       resolve: (_, { id }) => {
-        return posts[id];
+        return getPost(id);
       }
     },
     posts: {
       type: new GraphQLList(postType),
-      resolve: () => {
-        return posts;
+      resolve: getPosts
+    },
+    comment: {
+      type: commentType,
+      args: { id: { type: new GraphQLNonNull(GraphQLInt) } },
+      resolve: (_, { id }) => {
+        return getComment(id);
       }
     },
-    author: {
-      type: authorType,
-      description: 'Returns a single author based on name given',
-      args: {
-        name: { type: authorNameType }
-      },
-      resolve: (_, { name }: { name: 'Roger' | 'Flavio' }) => {
-        return authors[name];
-      }
-    },
-    authors: {
-      type: new GraphQLList(authorType),
-      resolve: () => {
-        return authors;
-      }
+    comments: {
+      type: new GraphQLList(commentType),
+      resolve: getComments
     }
   }
 });
-
 export const schema = new GraphQLSchema({
   query: queryType
 });
